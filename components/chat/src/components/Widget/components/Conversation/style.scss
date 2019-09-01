@@ -1,0 +1,14 @@
+@import './components/chat/src/scss/common.scss';
+@import './components/chat/src/scss/variables.scss';
+@import './components/chat/src/scss/animation.scss';
+
+.rcw-conversation-container {
+  @include animation(0, 0.5s, slide-in);
+  border-radius: 10px;
+  box-shadow: 0px 2px 10px 1px $grey-3;
+}
+
+.rcw-slide-out {
+  @include animation(0, 0.5s, slide-out);
+}
+

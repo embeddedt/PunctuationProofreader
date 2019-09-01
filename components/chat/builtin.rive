@@ -1,0 +1,25 @@
+> object endDialogue javascript
+this.endDialogueWhenMessageFinishes = true;
+return "";
+< object
+
+> object require_img javascript
+return "![" + arguments[1][1] + "](" + window.gt_imagePaths[arguments[1][0]] + ")";
+< object
+
+> object userFunc javascript
+let func = this.userFuncs[arguments[1][0]];
+if(func != undefined)
+    return func();
+return "Error: func " + arguments[1][0] + "does not exist";
+< object
+
++ *
+- Sorry, I didn't understand that. You can use the question mark at the top for help with any part of the game.
+
++ whats your name
+- My name is <env char_name>.
+^ Why would you ask me that when you can see it at the top of your screen? <call>endDialogue</call>
+
++ (hello|hi)
+- Hi! How's it going?

@@ -1,0 +1,16 @@
+@import './components/chat/src/scss/animation.scss';
+@import './components/chat/src/scss/common.scss';
+
+.rcw-widget-container {
+  display: none;
+  flex-direction: column;
+  position: relative;
+  pointer-events: auto;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.rcw-opened {
+  width: 100%;
+  display: flex;
+}

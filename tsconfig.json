@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "lib": [ "esnext", "dom", "dom.iterable", "scripthost" ],
+    "jsx": "react",
+    "module": "esnext",
+    "target": "es2018",
+    "noImplicitThis": false,
+    "noImplicitReturns": true,
+    "noEmitOnError": true,
+    "allowSyntheticDefaultImports": true,
+    "removeComments": false,
+    "experimentalDecorators": true,
+    "esModuleInterop": true
+  }
+}

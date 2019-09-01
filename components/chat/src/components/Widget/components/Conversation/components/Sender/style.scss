@@ -1,0 +1,47 @@
+@import './components/chat/src/scss/variables.scss';
+
+.rcw-sender {
+  align-items: center;
+  display: flex;
+  background-color: $grey-2;
+  height: 45px;
+  padding: 5px;
+  border-radius: 0 0 10px 10px;
+}
+
+.rcw-new-message {
+  width: 100%;
+  border: 0;
+  background-color: $grey-2;
+  height: 30px;
+  padding-left: 15px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.rcw-dropdown-message {
+  width: 100%;
+  button {
+    width: 100%;
+  }
+  .dropdown-menu {
+    width: 100%;
+  }
+}
+
+.rcw-send {
+  background: $grey-2;
+  border: 0;
+
+  .rcw-send-icon {
+    height: 25px;
+  }
+}
+
+@media screen and (max-width: 800px)  {
+  .rcw-sender {
+    flex-shrink: 0;
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "babel": {
+    "plugins": [
+      "@babel/plugin-proposal-class-properties",
+      [
+        "babel-plugin-root-import",
+        {
+          "paths": [
+            {
+              "rootPathSuffix": "./components/chat/src/store/actions",
+              "rootPathPrefix": "@actions"
+            },
+            {
+              "rootPathSuffix": "./components/chat/src/components/Widget/components/Conversation/components/Messages/components",
+              "rootPathPrefix": "@messagesComponents"
+            },
+            {
+              "rootPathSuffix": "./components/chat/src/components/Widget/components/Conversation/components/QuickButtons/components",
+              "rootPathPrefix": "@quickButtonsComponents"
+            },
+            {
+              "rootPathSuffix": "./components/chat/src/utils",
+              "rootPathPrefix": "@utils"
+            },
+            {
+              "rootPathSuffix": "./components/chat/assets",
+              "rootPathPrefix": "@assets"
+            },
+            {
+              "rootPathSuffix": "./components/chat/src",
+              "rootPathPrefix": "@"
+            }
+          ]
+        }
+      ]
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5"
+  },
+  "dependencies": {
+    "index.js": "0.0.3"
+  }
+}
