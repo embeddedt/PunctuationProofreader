@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "parcel index.html -d docs -p 8080 --no-autoinstall",
-    "build": "parcel build index.html -d docs --no-autoinstall --detailed-report --no-source-maps --public-url '.'",
+    "build": "parcel build index.html -d docs --no-autoinstall --detailed-report --no-source-maps",
     "start": "npm run watch",
-    "serve": "live-server --port=8080 dist",
+    "serve": "live-server --port=8080 docs",
     "typecheck": "tsc --noEmit"
   },
   "author": "",
@@ -46,6 +46,7 @@
     "@babel/preset-react": "^7.0.0",
     "@types/lodash-es": "^4.17.3",
     "autoprefixer": "^9.6.1",
+    "cssnano": "^4.1.10",
     "minimist": "^1.2.0",
     "requireg": "^0.2.2",
     "sass": "^1.22.10",
