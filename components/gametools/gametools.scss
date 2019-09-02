@@ -875,7 +875,60 @@ html {
         overflow-x: auto;
         position: relative;
     }
-
+    .gt-ccorrect-button {
+        font-size: 150%;
+        margin: 0.3em;
+        &::first-letter {
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: underline;
+        }
+    }
+    .gt-unitscan {
+        font-size: 2rem;
+        font-family: "Courier New", Courier, monospace;
+        padding: 0.2em;
+        background-color: black;
+        .gt-unitscan-unit-set {
+            display: inline-block;
+        }
+        .gt-unitscan-unit {
+            $arrow-size: 0.6em;
+            display: inline-block;
+            position: relative;
+            font-size: inherit;
+            font-family: inherit;
+            color: white;
+            font-weight: 300;
+            width: 1ch;
+            height: 1em;
+            margin-top: $arrow-size;
+            vertical-align: middle;
+            transition: color 0.15s linear;
+            &.gt-current, &:after {
+                color: red;
+                font-weight: bold;
+            }
+            &.gt-current:after {
+                opacity: 1;
+            }
+            &:after {
+                position: absolute;
+                font-size: $arrow-size;
+                color: inherit;
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                top: -1em;
+                left: 50%;
+                opacity: 0;
+                will-change: opacity;
+                transition: opacity 0.15s linear;
+                transform: translateX(-50%);
+                content: "\f063";
+                @extend .noselect;
+            }
+        }
+    }
     .finder-buttons {
         display: flex;
         width: 100%;

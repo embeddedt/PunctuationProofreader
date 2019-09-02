@@ -16,7 +16,7 @@ import GameTools from './components/gametools/GameTools';
 import InfoBox from './components/gametools/InfoBox';
 import HelpButton from './components/gametools/HelpButton';
 import { startCheck } from './components/gametools/AntiCheat';
-import DisplayedItem, { initializeArray, startDisplay } from './components/gametools/DisplayedItem';
+import DisplayedItem, { initializeArray, startDisplay, GameArrayItem } from './components/gametools/DisplayedItem';
 import Label from './components/gametools/Label';
 import { Question, QuestionType } from './components/gametools/Question';
 import Invoke from './components/gametools/Invoke';
@@ -25,13 +25,20 @@ import SetBackground from "./components/gametools/SetBackground";
 import ButtonFinder from "./components/gametools/ButtonFinder";
 import Condition from "./components/gametools/Condition";
 import UnitScanner from "./components/gametools/UnitScanner";
+import WrongRightQuestion from "./components/gametools/WrongRightQuestion";
+import CapitalCorrector from "./components/gametools/CapitalCorrector";
 
 
 let currentCategory = 0;
 
-type PunctuationQuestion = { wrong: string, right: string, extraHint?: string };
+type PunctuationQuestion = {
+    capital_question?: string;
+    punctuation_question?: string;
+    extraHint?: string;
+    right: string;
+};
 
-function generatePunctQuestion(indexNum: number, realSentence: PunctuationQuestion): DisplayedItem {
+function generatePunctQuestion(indexNum: number, realSentence: PunctuationQuestion): GameArrayItem {
     const instructions = (function(): string {
         if(currentCategory == 2)
             return '<p>You must use an Oxford comma on these questions.</p><p>A comma that is used before the word "<i>and</i>" in a list is called an Oxford comma.</p><p>Some people normally do not use Oxford commas: "cows, horses, pigs and sheep", but this game requires it.</p><hr/>';
@@ -40,9 +47,25 @@ function generatePunctQuestion(indexNum: number, realSentence: PunctuationQuesti
         else
             return undefined;
     })();
-    if(realSentence != null && realSentence != undefined)
-        return new Question(QuestionType.FillInTheBlank, `Correct the capitalization, punctuation, and/or meaning of the following sentence. <small class='text-muted'>Question ${indexNum + 1} of ${questions[currentCategory].length}</small>`, [ { html: realSentence.right, correct: true } ], true, { defaultValue: realSentence.wrong, stripPunctuation: false, showMobileTips: false, spellCheck: false }, instructions);
-    else
+    if(realSentence != null && realSentence != undefined) {
+        return new Invoke(async() => {
+            await new Promise((resolve) => {
+                /* Figure out what components we need */
+                const capital_answer = GameTools.pl_undef(realSentence.punctuation_question, realSentence.right);
+                const hasCapitals = (realSentence.capital_question != undefined);
+                const hasPunctuation = (realSentence.punctuation_question != undefined);
+                const questionHeading = ` <small class='text-muted'>Question ${indexNum + 1} of ${questions[currentCategory].length}</small>`;
+                const array = [
+                    hasCapitals ? new CapitalCorrector(realSentence.capital_question, capital_answer, `${hasPunctuation ? 'First, c' : 'C'}orrect the capitalization of the sentence.` + questionHeading) : Label.label(""),
+                    hasPunctuation ? new Question(QuestionType.FillInTheBlank, "Correct the punctuation and/or meaning of the following sentence." + questionHeading, [ { html: realSentence.right, correct: true } ], true, { defaultValue: realSentence.punctuation_question, stripPunctuation: false, showMobileTips: false, spellCheck: false }, instructions) : Label.label(""),
+                    new Invoke(() => resolve())
+                ];
+                initializeArray(array);
+                startDisplay(array);
+            });
+        });
+        /* return new Question(QuestionType.FillInTheBlank, `Correct the capitalization, punctuation, and/or meaning of the following sentence. <small class='text-muted'>Question ${indexNum + 1} of ${questions[currentCategory].length}</small>`, [ { html: realSentence.right, correct: true } ], true, { defaultValue: realSentence.wrong, stripPunctuation: false, showMobileTips: false, spellCheck: false }, instructions); */
+    } else
         return Label.label("");
 }
 
@@ -51,186 +74,190 @@ type FiveOfType<T> = [T, T, T, T, T];
 const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>)[] = [
     [
         {
-            wrong: "his name is Mike.",
+            capital_question: "his name is Mike.",
             right: "His name is Mike."
         },
         {
-            wrong: "They went to the park today",
+            punctuation_question: "They went to the park today",
             right: "They went to the park today."
         },
         {
-            wrong: "holly was so excited that she skipped home from school",
+            capital_question: "holly was so excited that she skipped home from school",
+            punctuation_question: "Holly was so excited that she skipped home from school",
             right: "Holly was so excited that she skipped home from school."
         },
         {
-            wrong: "that man in a suit is our principal.",
+            capital_question: "that man in a suit is our principal.",
             right: "That man in a suit is our principal."
         },
         {
-            wrong: "are you sure that you are ready",
+            capital_question: "are you sure that you are ready",
+            punctuation_question: "Are you sure that you are ready",
             right: "Are you sure that you are ready?"
         },
         {
-            wrong: "Get back here",
+            punctuation_question: "Get back here",
             right: "Get back here!"
         },
         {
-            wrong: "watch out",
+            capital_question: "watch out",
+            punctuation_question: "Watch out",
             right: "Watch out!"
         },
         {
-            wrong: "Are you trying to cheat!",
+            punctuation_question: "Are you trying to cheat!",
             right: "Are you trying to cheat?"
         },
         {
-            wrong: "absolutely not",
+            capital_question: "absolutely not",
+            punctuation_question: "Absolutely not",
             right: "Absolutely not!"
         },
         {
-            wrong: "I hope you're not lying",
+            punctuation_question: "I hope you're not lying",
             right: "I hope you're not lying."
         }
     ],
     [
         {
-            wrong: "the man's name is mr. Philips.",
+            capital_question: "the man's name is mr. Philips.",
             right: "The man's name is Mr. Philips."
         },
         {
-            wrong: "i Had a great day at school today!",
+            capital_question: "i Had a great day at school today!",
             right: "I had a great day at school today!"
         },
         {
-            wrong: "There is only one way to win this Contest.",
+            capital_question: "There is only one way to win this Contest.",
             right: "There is only one way to win this contest."
         },
         {
-            wrong: "I cannot BELIEVE this!",
+            capital_question: "I cannot BELIEVE this!",
             right: "I cannot believe this!"
         },
         {
-            wrong: "And now, let's hear from the mayor of our town, mr. james fundy!",
+            capital_question: "And now, let's hear from the mayor of our town, mr. james fundy!",
             right: "And now, let's hear from the mayor of our town, Mr. James Fundy!"
         },
         {
-            wrong: "Mr. Fundy is hear to talk about improvements to The Transit System.",
+            capital_question: "Mr. Fundy is here to talk about improvements to The Transit System.",
             right: "Mr. Fundy is here to talk about improvements to the transit system."
         },
         {
-            wrong: "We believe that transit is fundamental to everyday Life.",
+            capital_question: "We believe that transit is fundamental to everyday Life.",
             right: "We believe that transit is fundamental to everyday life."
         },
         {
-            wrong: "To this end, We will be increasing the amount of buses during the day.",
+            capital_question: "To this end, We will be increasing the amount of buses during the day.",
             right: "To this end, we will be increasing the amount of buses during the day."
         },
         {
-            wrong: "The new transit Plan will deliver substantial improvements to our Customers.",
+            capital_question: "The new transit Plan will deliver substantial improvements to our Customers.",
             right: "The new transit plan will deliver substantial improvements to our customers."
         },
         {
-            wrong: "Are there any Questions or Concerns?",
+            capital_question: "Are there any Questions or Concerns?",
             right: "Are there any questions or concerns?"
         }
     ],
     [
         {
-            wrong: "This is your 1:01 Meadow Heights westbound train, stopping at Hudson Northcliff, and Riverside.",
+            punctuation_question: "This is your 1:01 Meadow Heights westbound train, stopping at Hudson Northcliff, and Riverside.",
             right: "This is your 1:01 Meadow Heights westbound train, stopping at Hudson, Northcliff, and Riverside."
         },
         {
-            wrong: "As a note, the heaters in train cars 105, 277 333, and 543 are not working.",
+            punctuation_question: "As a note, the heaters in train cars 105, 277 333, and 543 are not working.",
             right: "As a note, the heaters in train cars 105, 277, 333, and 543 are not working."
         },
         {
-            wrong: "Once you disembark at Riverside, Riverside Transit buses on Routes 31, 24, 78 are available to take you to your destinations.",
+            punctuation_question: "Once you disembark at Riverside, Riverside Transit buses on Routes 31, 24, 78 are available to take you to your destinations.",
             right: "Once you disembark at Riverside, Riverside Transit buses on Routes 31, 24, and 78 are available to take you to your destinations."
         },
         {
-            wrong: "Do you want to buy, a tablet, a phone, or a laptop?",
+            punctuation_question: "Do you want to buy, a tablet, a phone, or a laptop?",
             right: "Do you want to buy a tablet, a phone, or a laptop?"
         },
         {
-            wrong: "Marie, bought, apples, oranges, and, bananas.",
+            punctuation_question: "Marie, bought, apples, oranges, and, bananas.",
             right: "Marie bought apples, oranges, and bananas."
         }
     ],
     [
         {
-            wrong: "Jones went to Walmart but Anne, went to Target.",
+            punctuation_question: "Jones went to Walmart but Anne, went to Target.",
             right: "Jones went to Walmart, but Anne went to Target."
         },
         {
-            wrong: "We have a 30% off sale on fruit and a 20% off sale, on electronics!",
+            punctuation_question: "We have a 30% off sale on fruit and a 20% off sale, on electronics!",
             right: "We have a 30% off sale on fruit, and a 20% off sale on electronics!"
         },
         {
-            wrong: "We wanted to use a train but we ended up having to use a bus instead.",
+            punctuation_question: "We wanted to use a train but we ended up having to use a bus instead.",
             right: "We wanted to use a train, but we ended up having to use a bus instead."
         },
         {
-            wrong: "This is a closed-book, test.",
+            punctuation_question: "This is a closed-book, test.",
             right: "This is a closed-book test."
         },
         {
-            wrong: "If I can't have it no one can!",
+            punctuation_question: "If I can't have it no one can!",
             right: "If I can't have it, no one can!"
         }
     ],
     [
         {
-            wrong: "As they have multiple deadline at the end of the semester, the more work students can complete, earlier on, the better.",
+            punctuation_question: "As they have multiple deadline at the end of the semester, the more work students can complete, earlier on, the better.",
             right: "As they have multiple deadlines at the end of the semester, the more work students can complete earlier on, the better."
         },
         {
-            wrong: "Once we successfully hack this game we will have all the answers and be unstoppable!",
+            punctuation_question: "Once we successfully hack this game we will have all the answers and be unstoppable!",
             right: "Once we successfully hack this game, we will have all the answers, and be unstoppable!"
         },
         {
-            wrong: "Nice try but cheaters never prosper,",
+            punctuation_question: "Nice try but cheaters never prosper,",
             right: "Nice try, but cheaters never prosper."
         },
         {
-            wrong: "Whether or not it will rain today, remains to be seen.",
+            punctuation_question: "Whether or not it will rain today, remains to be seen.",
             right: "Whether or not it will rain today remains to be seen."
         },
         {
-            wrong: "Just so you know this category is done now.",
+            punctuation_question: "Just so you know this category is done now.",
             right: "Just so you know, this category is done now."
         }
     ],
     [
         {
-            wrong: "Martin Mersenich was quoted as saying Did you know that it rains birds?",
+            punctuation_question: "Martin Mersenich was quoted as saying Did you know that it rains birds?",
             right: 'Martin Mersenich was quoted as saying, "Did you know that it rains birds?"'
         },
         {
-            wrong: 'When asked for comment, the reporter said, "It remains to be seen whether or not the criminals will receive a life sentence".',
+            punctuation_question: 'When asked for comment, the reporter said, "It remains to be seen whether or not the criminals will receive a life sentence".',
             right: 'When asked for comment, the reporter said, "It remains to be seen whether or not the criminals will receive a life sentence."'
         },
         {
-            wrong: 'I\'m reading this book entitled The long-lost whale',
+            capital_question: 'I\'m reading this book entitled The long-lost whale',
+            punctuation_question: 'I\'m reading this book entitled The Long-Lost Whale',
             right: 'I\'m reading this book entitled "The Long-Lost Whale".'
         },
         {
-            wrong: 'The first and last letters of titles should not be capitalized.',
+            punctuation_question: 'The first and last letters of titles should not be capitalized.',
             right: 'The first and last letters of titles should be capitalized.'
         },
         {
-            wrong: 'As a wise linguist once said, Comma splicing is bad, don\'t do it.',
+            punctuation_question: 'As a wise linguist once said, Comma splicing is bad, don\'t do it.',
             right: 'As a wise linguist once said, "Comma splicing is bad, so don\'t do it."',
             extraHint: "Hint: Comma splicing is bad, so don't do it."
         }
     ]
 ];
 
-function catQuestion(index: number): () => DisplayedItem {
+function catQuestion(index: number): () => GameArrayItem {
     return () => generatePunctQuestion(index, questions[currentCategory][index]);
 }
 let finderResult: boolean = false;
 const myArray = [
     new SetBackground(require('./punctuation.png')),
-    new UnitScanner("Unit scanner", "Test string".split('')),
     Label.label("category_selection"),
     new ButtonFinder("Choose a category.", "", [
         "Beginning capitals and ending punctuation",

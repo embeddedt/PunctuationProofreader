@@ -11,15 +11,19 @@ export interface QuestionOption {
 }
 export enum QuestionType {
     MultipleChoice,
-    FillInTheBlank
+    FillInTheBlank,
+    Custom
 }
 export class Question extends InfoBox {
     readonly isQuestion: boolean;
     constructor(protected type: QuestionType, question: GameValue<string>, protected choices: QuestionOption[], protected shouldReDisplay = true, style?: StylisticOptions, protected instructions: GameValue<string> = "") {
         super(question, "", Question.needsOKButton(type) ? "OK" : null, InfoBox.defaultDelay, style);
-        this.isQuestion = choices.some((choice: QuestionOption) => {
-            return GameTools.pl_undef(choice.correct, false);
-        });
+        if(this.type == QuestionType.Custom)
+            this.isQuestion = true;
+        else
+            this.isQuestion = choices.some((choice: QuestionOption) => {
+                return GameTools.pl_undef(choice.correct, false);
+            });
     }
     public static needsOKButton(type: QuestionType): boolean {
         return (type == QuestionType.FillInTheBlank);
@@ -54,15 +58,26 @@ export class Question extends InfoBox {
             throw new Error("Unsupported question type");
         }
     }
+    protected disableQuestionInput() {
+        throw new Error("Unsupported question type");
+    }
+    protected shouldRepeatAnswer(): boolean {
+        if(this.type == QuestionType.MultipleChoice)
+            return true;
+        else if(this.type == QuestionType.FillInTheBlank)
+            return false;
+        else
+            throw new Error("Unsupported question type");
+    }
     async answered($button: JQuery<HTMLElement>) {
         let option: QuestionOption = $button.data("questionOption");
-        if(option.fn !== undefined)
+        if(option != undefined && option != null && option.fn !== undefined)
             await option.fn.call(option);
         GameTools.lastData = this.choices.indexOf(option);
         if(!this.isQuestion || this.isCorrect($button, option)) {
             GameTools.lastResult = true;
             if(this.objStyle.showCorrectConfirmation) {
-                const correctAnswer = (this.type != QuestionType.FillInTheBlank) ? `The correct answer was ${option.html}` : "";
+                const correctAnswer = (this.shouldRepeatAnswer()) ? `The correct answer was ${option.html}` : "";
                 this.$title.html(`That's right! ${correctAnswer}`);
                 if(this.type == QuestionType.MultipleChoice) {
                     $button.empty();
@@ -73,6 +88,8 @@ export class Question extends InfoBox {
                     }));
                 } else if(this.type == QuestionType.FillInTheBlank) {
                     $button.prop("disabled", true);
+                } else {
+                    this.disableQuestionInput();
                 }
                 
                 await GameTools.sleep(3000);
@@ -101,6 +118,9 @@ export class Question extends InfoBox {
     dialogDisplayed() {
         super.dialogDisplayed();
         this.$dialog.find("textarea").focus();
+    }
+    createCustomQuestion() {
+        throw new Error("Unexpected question type");
     }
     async dialogCreated() {
         await super.dialogCreated();
@@ -143,7 +163,7 @@ export class Question extends InfoBox {
             if(this.objStyle.showMobileTips)
                 $body.append($("<small></small>").addClass("form-text text-muted").text("On a small screen? Consider solving the question on a piece of paper and then typing it in at the end."));
         } else {
-            throw new Error("Unexpected question type");
+           this.createCustomQuestion();
         }
         
     }

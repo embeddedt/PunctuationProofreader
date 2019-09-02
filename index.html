@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Punctuation Proofreader</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="styles.scss">
+    </head>
+    <body>
+        <div class="preloader">
+            <style>.preloader{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;height:100%;z-index:10000000;max-width:500px;display:flex;justify-content:center;align-items:center;background-color:#FFF;flex-direction:column;}</style>
+            <style>.preloader #myProgress {
+                    width: 75%;
+                    max-width: 500px;
+                    background-color: grey;
+                    }
+                    
+                    .preloader #myBar {
+                    width: 0;
+                    height: 30px;
+                    transition: width 0.1s linear;
+                    background-color: green;
+                    }
+                    hr {
+                        border: 0;
+                        clear:both;
+                        display:block;
+                        width: 96%;               
+                        background-color:gray;
+                        height: 1px;
+                    }
+                    #attributions {
+                        font-size: 8px;
+                    }
+            </style>
+            <h1 id="preloader-game-title"></h1>
+            <div id="myProgress">
+                <div id="myBar"></div>
+            </div>
+            <span id="current-action">Downloading assets (<span id="percentage">0%</span>)...</span>
+            <hr/>
+            <div id="attributions">
+                Free vector art via <a target="_blank" href="https://www.vecteezy.com">www.Vecteezy.com</a>
+                <br/>
+                <div>Some information from <a target="_blank" href="https://en.wikipedia.org">Wikipedia</a></div>
+            </div>
+            <img id="fake-script" style="display:none;" src="code.tsx"/>
+            <script type="text/javascript">
+                /* Polyfill a feature for IE */
+                (function (arr) {
+                    arr.forEach(function (item) {
+                        if (item.hasOwnProperty('remove')) {
+                        return;
+                        }
+                        Object.defineProperty(item, 'remove', {
+                        configurable: true,
+                        enumerable: true,
+                        writable: true,
+                        value: function remove() {
+                            if(this.parentNode != undefined && this.parentNode != null)
+                                this.parentNode.removeChild(this);
+                        }
+                        });
+                    });
+                })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+                (function() {
+                    var element = document.getElementById('fake-script');
+                    var scriptUrl = element.src;
+                    element.remove();
+                    var progress = document.getElementById("myBar");
+                    var percentage = document.getElementById("percentage");
+                    var action = document.getElementById("current-action");
+                    document.getElementById('preloader-game-title').textContent = document.title;
+                    var req = new XMLHttpRequest();
+
+                    // report progress events
+                    window.load_startDate = Date.now();
+                    req.addEventListener("progress", function(event) {
+                        if (event.lengthComputable) {
+                            var percentComplete = event.loaded / event.total;
+                            let prc = Math.round(percentComplete*100);
+                            progress.style.width = prc + '%';
+                            percentage.textContent = prc + '%';
+                        } else {
+                            progress.style.width = 0;
+                        }
+                    }, false);
+                    var loadScript = function(event) {
+                        progress.style.width = '100%';
+                        percentage.textContent = '100%';
+                        var e = event.target;
+                        var s = document.createElement("script");
+                        s.innerHTML = e.responseText;
+                        // or: s[s.innerText!=undefined?"innerText":"textContent"] = e.responseText
+                        document.documentElement.appendChild(s);
+                        action.textContent = "Starting scripts...";
+                    };
+                    // load responseText into a new script element
+                    req.addEventListener("load", function(event) {
+                        window.load_endDate = Date.now();
+                        loadScript(event);
+                    }, false);
+
+                    req.overrideMimeType("text/plain");
+                    req.open("GET", scriptUrl);
+                    req.send();
+                })();
+                
+            </script>
+        </div>
+    </body>
+</html>

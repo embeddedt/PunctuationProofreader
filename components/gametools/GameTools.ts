@@ -361,6 +361,9 @@ namespace GameTools {
     export function getRandomBool(): boolean {
         return Math.random() >= 0.5;
     }
+    export function replaceAt(str: string, index: number, replacement: string): string {
+        return str.substr(0, index) + replacement+ str.substr(index + replacement.length);
+    }
     export function pl_undef<T>(val: T, defaultVal: T, handleNull = false): T {
         let useDefault = false;
         if(val == undefined)

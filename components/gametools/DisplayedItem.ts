@@ -245,6 +245,7 @@ export abstract class DisplayedItem {
         this.layerNum = 0;
         Emitter(this);
         this.initStyles();
+        this.setupExtendedEvents();
     }
     protected getDefaultStyle(): StylisticOptions {
         return {};
@@ -284,12 +285,12 @@ export abstract class DisplayedItem {
         return this.objStyle;
     }
     
-    public on: (event: string, fn: (...args: any[]) => void) => void;
-    public once: (event: string, fn: (...args: any[]) => void) => void;
-    public off: (event?: string, fn?: (...args: any[]) => void) => void;
-    public emit: (event: string, ...args: any[]) => void;
-    public listeners: (event: string) => ((...args: any[]) => void)[];
-    public hasListeners: (event: string) => boolean;
+    public readonly on: (event: string, fn: (...args: any[]) => void) => this;
+    public readonly once: (event: string, fn: (...args: any[]) => void) => this;
+    public readonly off: (event?: string, fn?: (...args: any[]) => void) => this;
+    public readonly emit: (event: string, ...args: any[]) => this;
+    public readonly listeners: (event: string) => ((...args: any[]) => void)[];
+    public readonly hasListeners: (event: string) => boolean;
     public setParentArray(array: GameArray, force = false): this {
         if(array == null) {
             array = [ this ];
@@ -341,11 +342,44 @@ export abstract class DisplayedItem {
             DisplayedItem.visibleStack[i].updateZIndex();
         }
     }
+    private static readonly gt_windowEventHandlers = ['keydown', 'keyup'];
+    private gtDomEventHandler(event: JQuery.Event) {
+        this.emit(`dom-${event.type}`, event);
+    }
+    private setupExtendedEvents() {
+        let pressedKeys: any[] = [];
+        this.on("dom-keydown", (event: JQuery.KeyDownEvent) => {
+            let isFirst = false;
+            if(pressedKeys.indexOf(event.which) == -1) {
+                pressedKeys.push(event.which);
+                isFirst = true;
+            }
+            this.emit("gt-keydown", event, isFirst);
+        });
+        this.on("dom-keyup", (event: JQuery.KeyUpEvent) => {
+            const index = pressedKeys.indexOf(event.which);
+            if(index != -1) {
+                pressedKeys.splice(index, 1);
+            }
+            this.emit("gt-keyup", event);
+        });
+    }
+    private attachEventHandlers() {
+        DisplayedItem.gt_windowEventHandlers.forEach((eventName) => {
+            $(window).on(eventName, $.proxy(this.gtDomEventHandler, this));
+        });
+    }
+    private detachEventHandlers() {
+        DisplayedItem.gt_windowEventHandlers.forEach((eventName) => {
+            $(window).off(eventName, $.proxy(this.gtDomEventHandler, this));
+        });
+    }
     async display() {
         this._isDisplaying = true;
         this.addToVisibleStack();
         DisplayedItem.updateHelp();
         DisplayedItem.updateContainerClasses();
+        this.attachEventHandlers();
         this.emit("display");
     }
     static updateContainerClasses() {
@@ -364,6 +398,7 @@ export abstract class DisplayedItem {
         this._isDisplaying = false;
         DisplayedItem.updateHelp();
         DisplayedItem.updateContainerClasses();
+        this.detachEventHandlers();
         await this.detachReact();
         await this._undisplay();
     };
