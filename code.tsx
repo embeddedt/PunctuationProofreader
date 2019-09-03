@@ -24,9 +24,8 @@ import Loop from "./components/gametools/Loop";
 import SetBackground from "./components/gametools/SetBackground";
 import ButtonFinder from "./components/gametools/ButtonFinder";
 import Condition from "./components/gametools/Condition";
-import UnitScanner from "./components/gametools/UnitScanner";
-import WrongRightQuestion from "./components/gametools/WrongRightQuestion";
 import CapitalCorrector from "./components/gametools/CapitalCorrector";
+import Branch from "./components/gametools/Branch";
 
 
 let currentCategory = 0;
@@ -124,7 +123,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "The man's name is Mr. Philips."
         },
         {
-            capital_question: "i Had a great day at school today!",
+            capital_question: "I had a great day at school Today!",
             right: "I had a great day at school today!"
         },
         {
@@ -132,7 +131,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "There is only one way to win this contest."
         },
         {
-            capital_question: "I cannot BELIEVE this!",
+            capital_question: "I cannot believe This!",
             right: "I cannot believe this!"
         },
         {
@@ -170,7 +169,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "As a note, the heaters in train cars 105, 277, 333, and 543 are not working."
         },
         {
-            punctuation_question: "Once you disembark at Riverside, Riverside Transit buses on Routes 31, 24, 78 are available to take you to your destinations.",
+            punctuation_question: "Once you disembark at Riverside, Riverside Transit buses on Routes 31, 24 and 78 are available to take you to your destinations.",
             right: "Once you disembark at Riverside, Riverside Transit buses on Routes 31, 24, and 78 are available to take you to your destinations."
         },
         {
@@ -206,15 +205,15 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
     ],
     [
         {
-            punctuation_question: "As they have multiple deadline at the end of the semester, the more work students can complete, earlier on, the better.",
+            punctuation_question: "As they have multiple deadlines at the end of the semester the more work students can complete earlier on, the better.",
             right: "As they have multiple deadlines at the end of the semester, the more work students can complete earlier on, the better."
         },
         {
             punctuation_question: "Once we successfully hack this game we will have all the answers and be unstoppable!",
-            right: "Once we successfully hack this game, we will have all the answers, and be unstoppable!"
+            right: "Once we successfully hack this game, we will have all the answers and be unstoppable!"
         },
         {
-            punctuation_question: "Nice try but cheaters never prosper,",
+            punctuation_question: "Nice try but cheaters never prosper.",
             right: "Nice try, but cheaters never prosper."
         },
         {
@@ -236,13 +235,13 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: 'When asked for comment, the reporter said, "It remains to be seen whether or not the criminals will receive a life sentence."'
         },
         {
-            capital_question: 'I\'m reading this book entitled The long-lost whale',
-            punctuation_question: 'I\'m reading this book entitled The Long-Lost Whale',
-            right: 'I\'m reading this book entitled "The Long-Lost Whale".'
+            punctuation_question: 'We need to work fast. said Betty.',
+            right: '"We need to work fast," said Betty.'
         },
         {
             punctuation_question: 'The first and last letters of titles should not be capitalized.',
-            right: 'The first and last letters of titles should be capitalized.'
+            right: 'The first and last letters of titles should be capitalized.',
+            extraHint: 'You need to change the meaning of this sentence, not add quotation marks.'
         },
         {
             punctuation_question: 'As a wise linguist once said, Comma splicing is bad, don\'t do it.',
@@ -255,10 +254,42 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
 function catQuestion(index: number): () => GameArrayItem {
     return () => generatePunctQuestion(index, questions[currentCategory][index]);
 }
+
+const catNames = new Map<string, number>([
+    [ "Beginning capitals and ending punctuation", 0 ],
+    [ "Capitals", 1 ],
+    [ "Commas in a series", 2 ],
+    [ "Commas with compound sentences", 3 ],
+    [ "Commas with introductory phrases", 4 ],
+    [ "Quotation punctuation", 5 ]
+]);
+let usedLink = false;
+
 let finderResult: boolean = false;
 const myArray = [
     new SetBackground(require('./punctuation.png')),
     Label.label("category_selection"),
+    new Invoke(() => {
+        return new Promise((resolve) => {
+            if(GameTools.directLink != "") {
+                for(let [key, val] of catNames) {
+                    if(GameTools.directLink == GameTools.slugify(key)) {
+                        console.log(GameTools.directLink + " mapped to category: " + val);
+                        usedLink = true;
+                        currentCategory = val;
+                        break;
+                    }
+                }
+                if(usedLink) {
+                    new Branch({ index: "catQuestions" }).setParentArray(myArray, true).display();
+                    return; /* do not resolve */
+                } else {
+                    console.warn("Unknown link: " + GameTools.directLink);
+                }
+            }
+            resolve();
+        });
+    }),
     new ButtonFinder("Choose a category.", "", [
         "Beginning capitals and ending punctuation",
         "Capitals",
@@ -269,6 +300,7 @@ const myArray = [
     ], 0, () => "Choose a category.").setLayer(2),
     new Invoke(() => finderResult = GameTools.lastResult),
     new Invoke(() => currentCategory = GameTools.lastData),
+    Label.label("catQuestions"),
     catQuestion(0),
     catQuestion(1),
     catQuestion(2),
@@ -279,12 +311,11 @@ const myArray = [
     catQuestion(7),
     catQuestion(8),
     catQuestion(9),
-    new Condition(new Loop({ index: "fireworks" }), Label.label(""), () => finderResult),
+    new Condition(new Loop({ index: "fireworks" }), Label.label(""), () => (finderResult || usedLink)),
     new InfoBox("Great job!", "You answered all the questions in this category.<p></p>Now you can try another one!", "OK"),
-    new Loop({ index: "category_selection" }),
     Label.label("fireworks"),
     new SetBackground(require('./components/fireworks.jpg')),
-    new InfoBox("Nice work!", `<img class='img-fluid' src='${require('./components/happy_face.png')}'/><p></p>You've finished all the categories!`, null)
+    new InfoBox("Nice work!", `<img class='img-fluid' src='${require('./components/happy_face.png')}'/><p></p>You've finished!`, null)
 ];
 
 $(async function() {

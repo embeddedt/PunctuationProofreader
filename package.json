@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "parcel index.html -d docs -p 8080 --no-autoinstall",
-    "build": "parcel build index.html -d docs --no-autoinstall --detailed-report --no-source-maps --public-url .",
+    "build": "rm -r docs/* && parcel build index.html -d docs --no-autoinstall --detailed-report --no-source-maps --public-url .",
     "start": "npm run watch",
     "serve": "live-server --port=8080 docs",
     "typecheck": "tsc --noEmit"

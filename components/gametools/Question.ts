@@ -159,6 +159,7 @@ export class Question extends InfoBox {
                 const input: HTMLTextAreaElement = e.target as any;
                 input.value = input.value.replace(/\n/g, '');
             });
+            $body.append($("<p></p>"));
             $body.append($input);
             if(this.objStyle.showMobileTips)
                 $body.append($("<small></small>").addClass("form-text text-muted").text("On a small screen? Consider solving the question on a piece of paper and then typing it in at the end."));

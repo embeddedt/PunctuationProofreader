@@ -17,7 +17,8 @@ namespace GameTools {
     export let lastResult: boolean = false;
     export let lastData: any = null;
     export let helpShown: boolean;
-    export let helpRef: React.RefObject<any> = React.createRef();;
+    export let helpRef: React.RefObject<any> = React.createRef();
+    export let directLink: string = null;
 
     export function shuffle<T>(a: T[], shouldShuffle = true): T[] {
         if (!shouldShuffle) return a;
@@ -136,7 +137,40 @@ namespace GameTools {
         }
         return Promise.resolve();
     }
+    export interface QueryStringsObject {
+        [index: string]: string;
+    }
+    export function getQueryString(query: string): string;
+    export function getQueryString(): QueryStringsObject;
+    export function getQueryString(query?: string): (string|QueryStringsObject) {
+        var key: (string|boolean) = false, res = {}, itm = null;
+        // get the query string without the ?
+        var qs = location.search.substring(1);
+        // check for the key as an argument
+        if (query != undefined && query.length > 1)
+          key = query;
+        // make a regex pattern to grab key/value
+        var pattern = /([^&=]+)=([^&]*)/g;
+        // loop the items in the query string, either
+        // find a match to the argument, or build an object
+        // with key/value pairs
+        while (itm = pattern.exec(qs)) {
+          if (key !== false && decodeURIComponent(itm[1]) === key)
+            return decodeURIComponent(itm[2]);
+          else if (key === false)
+            res[decodeURIComponent(itm[1])] = decodeURIComponent(itm[2]);
+        }
+
+        return key === false ? res : null;
+    }
     export function monkeyPatch() {
+        directLink = window.location.hash.replace('#', '');
+        if(directLink == "") {
+            directLink = getQueryString('link');
+            if(directLink == null)
+                directLink = "";
+        }
+        console.log("Direct link: " + directLink);
         $(".preloader").fadeOut(() => $(".preloader").remove());
         // Setup our DOM elements
         const $gametools_wrapper = $("<div></div>").attr(
