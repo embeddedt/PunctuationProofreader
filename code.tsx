@@ -311,8 +311,6 @@ const myArray = [
     catQuestion(7),
     catQuestion(8),
     catQuestion(9),
-    new Condition(new Loop({ index: "fireworks" }), Label.label(""), () => (finderResult || usedLink)),
-    new InfoBox("Great job!", "You answered all the questions in this category.<p></p>Now you can try another one!", "OK"),
     Label.label("fireworks"),
     new SetBackground(require('./components/fireworks.jpg')),
     new InfoBox("Nice work!", `<img class='img-fluid' src='${require('./components/happy_face.png')}'/><p></p>You've finished!`, null)
