@@ -40,7 +40,11 @@ type PunctuationQuestion = {
 function generatePunctQuestion(indexNum: number, realSentence: PunctuationQuestion): GameArrayItem {
     const instructions = (function(): string {
         if(currentCategory == 2)
-            return '<p>You must use an Oxford comma on these questions.</p><p>A comma that is used before the word "<i>and</i>" in a list is called an Oxford comma.</p><p>Some people normally do not use Oxford commas: "cows, horses, pigs and sheep", but this game requires it.</p><hr/>';
+            return `<p>You must use an Oxford comma on these questions.</p>
+            <p>A comma that is used before the word "<i>and</i>" in a list is called an Oxford comma.</p>
+            <p>Here's a sentence without the Oxford comma: "The farm had cows, horses, pigs and sheep."</p>
+            <p>Here's a sentence with the Oxford comma: "The farm had cows, horses, pigs<b>,</b> and sheep."</p>
+        <hr/>`;
         else if(realSentence != null && realSentence != undefined)
             return realSentence.extraHint;
         else
@@ -187,8 +191,8 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "Jones went to Walmart, but Anne went to Target."
         },
         {
-            punctuation_question: "We have a 30% off sale on fruit and a 20% off sale, on electronics!",
-            right: "We have a 30% off sale on fruit, and a 20% off sale on electronics!"
+            punctuation_question: "We have a 30% off sale on fruit and we have a 20% off sale, on electronics!",
+            right: "We have a 30% off sale on fruit, and we have a 20% off sale on electronics!"
         },
         {
             punctuation_question: "We wanted to use a train but we ended up having to use a bus instead.",
@@ -239,14 +243,13 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: '"We need to work fast," said Betty.'
         },
         {
-            punctuation_question: 'The first and last letters of titles should not be capitalized.',
-            right: 'The first and last letters of titles should be capitalized.',
-            extraHint: 'You need to change the meaning of this sentence, not add quotation marks.'
+            capital_question: '"I\'m 100% sure!" Said Thomas.',
+            right: '"I\'m 100% sure!" said Thomas.'
         },
         {
             punctuation_question: 'As a wise linguist once said, Comma splicing is bad, don\'t do it.',
             right: 'As a wise linguist once said, "Comma splicing is bad, so don\'t do it."',
-            extraHint: "Hint: Comma splicing is bad, so don't do it."
+            extraHint: "Hint: Comma splicing is bad, <b>so</b> don't do it."
         }
     ]
 ];
