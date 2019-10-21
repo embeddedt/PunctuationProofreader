@@ -77,10 +77,11 @@ type FiveOfType<T> = [T, T, T, T, T];
 const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>)[] = [
     [
         {
-            capital_question: "his name is Mike.",
+            capital_question: "his name is mike.",
             right: "His name is Mike."
         },
         {
+            capital_question: "They went to the Park today",
             punctuation_question: "They went to the park today",
             right: "They went to the park today."
         },
@@ -90,7 +91,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "Holly was so excited that she skipped home from school."
         },
         {
-            capital_question: "that man in a suit is our principal.",
+            capital_question: "that man in a suit is our Principal.",
             right: "That man in a suit is our principal."
         },
         {
@@ -159,7 +160,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "The new transit plan will deliver substantial improvements to our customers."
         },
         {
-            capital_question: "Are there any Questions or Concerns?",
+            capital_question: "Are there any Questions or concerns?",
             right: "Are there any questions or concerns?"
         }
     ],
