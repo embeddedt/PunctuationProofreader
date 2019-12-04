@@ -7,6 +7,8 @@ import './components/import-jquery';
 import 'popper.js';
 import 'bootstrap';
 
+import 'unorm';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -60,7 +62,7 @@ function generatePunctQuestion(indexNum: number, realSentence: PunctuationQuesti
                 const questionHeading = ` <small class='text-muted'>Question ${indexNum + 1} of ${questions[currentCategory].length}</small>`;
                 const array = [
                     hasCapitals ? new CapitalCorrector(realSentence.capital_question, capital_answer, `${hasPunctuation ? 'First, c' : 'C'}orrect the capitalization of the sentence.` + questionHeading) : Label.label(""),
-                    hasPunctuation ? new Question(QuestionType.FillInTheBlank, "Correct the punctuation and/or meaning of the following sentence." + questionHeading, [ { html: realSentence.right, correct: true } ], true, { defaultValue: realSentence.punctuation_question, stripPunctuation: false, showMobileTips: false, spellCheck: false }, instructions) : Label.label(""),
+                    hasPunctuation ? new Question(QuestionType.FillInTheBlank, "Correct the punctuation and/or meaning of the following sentence." + questionHeading, [ { html: realSentence.right.normalize(), correct: true } ], true, { defaultValue: realSentence.punctuation_question.normalize(), stripPunctuation: false, showMobileTips: false, spellCheck: false }, instructions) : Label.label(""),
                     new Invoke(() => resolve())
                 ];
                 initializeArray(array);
