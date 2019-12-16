@@ -14,6 +14,14 @@ export enum QuestionType {
     FillInTheBlank,
     Custom
 }
+
+function getUnicode(str: string): number[] {
+    var arr = [];
+    for(var i=0; i<str.length; i++) {
+        arr.push(str.charCodeAt(i))
+    }
+    return arr;
+}
 export class Question extends InfoBox {
     readonly isQuestion: boolean;
     constructor(protected type: QuestionType, question: GameValue<string>, protected choices: QuestionOption[], protected shouldReDisplay = true, style?: StylisticOptions, protected instructions: GameValue<string> = "") {
@@ -97,6 +105,16 @@ export class Question extends InfoBox {
             this.displayNext();
         } else {
             GameTools.lastResult = false;
+            var arr=[];
+            
+            var jsonDebug = { wasCorrect: false, answeredString: $button.val(), expectedString: DisplayedItem.getValue(this, option.html), answeredUnicode: getUnicode($button.val() as string), expectedUnicode: getUnicode(DisplayedItem.getValue(this, option.html))};
+            document.body.textContent = "";
+            var div = document.createElement("div");
+            document.body.appendChild(div);
+            div.style.maxWidth = "100%";
+            div.style.wordWrap = "break-word";
+            div.textContent = JSON.stringify(jsonDebug, null, 2);
+            return;
             this.title = "Sorry, that wasn't the correct answer.";
             if(this.shouldReDisplay)
                 this.redisplay();
