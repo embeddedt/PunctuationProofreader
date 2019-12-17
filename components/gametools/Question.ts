@@ -61,6 +61,8 @@ export class Question extends InfoBox {
                 text = GameTools.stripPunctuation(text);
                 answer = GameTools.stripPunctuation(answer);
             }
+            text = text.replace(/\s+/g, ' ').trim();
+            answer = answer.replace(/\s+/g, ' ').trim();
             return text == answer;
         } else {
             throw new Error("Unsupported question type");
@@ -105,16 +107,7 @@ export class Question extends InfoBox {
             this.displayNext();
         } else {
             GameTools.lastResult = false;
-            var arr=[];
             
-            var jsonDebug = { wasCorrect: false, answeredString: $button.val(), expectedString: DisplayedItem.getValue(this, option.html), answeredUnicode: getUnicode($button.val() as string), expectedUnicode: getUnicode(DisplayedItem.getValue(this, option.html))};
-            document.body.textContent = "";
-            var div = document.createElement("div");
-            document.body.appendChild(div);
-            div.style.maxWidth = "100%";
-            div.style.wordWrap = "break-word";
-            div.textContent = JSON.stringify(jsonDebug, null, 2);
-            return;
             this.title = "Sorry, that wasn't the correct answer.";
             if(this.shouldReDisplay)
                 this.redisplay();
