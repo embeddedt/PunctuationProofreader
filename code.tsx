@@ -54,7 +54,7 @@ function generatePunctQuestion(indexNum: number, realSentence: PunctuationQuesti
     })();
     if(realSentence != null && realSentence != undefined) {
         return new Invoke(async() => {
-            await new Promise((resolve) => {
+            await new Promise<void>((resolve) => {
                 /* Figure out what components we need */
                 const capital_answer = GameTools.pl_undef(realSentence.punctuation_question, realSentence.right);
                 const hasCapitals = (realSentence.capital_question != undefined);
@@ -79,8 +79,8 @@ type FiveOfType<T> = [T, T, T, T, T];
 const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>)[] = [
     [
         {
-            capital_question: "his name is Mike.",
-            right: "His name is Mike."
+            capital_question: "james, his name is Mike.",
+            right: "James, his name is Mike."
         },
         {
             capital_question: "they went to the park today",
@@ -97,18 +97,19 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "That man in a suit is our principal."
         },
         {
-            capital_question: "are you sure that you are ready",
-            punctuation_question: "Are you sure that you are ready",
-            right: "Are you sure that you are ready?"
+            capital_question: "mark, are you sure that you are ready",
+            punctuation_question: "Mark, are you sure that you are ready",
+            right: "Mark, are you sure that you are ready?"
         },
         {
-            punctuation_question: "Get back here",
-            right: "Get back here!"
+            capital_question: "scott, get back here", 
+            punctuation_question: "Scott, get back here",
+            right: "Scott, get back here!"
         },
         {
-            capital_question: "watch out",
-            punctuation_question: "Watch out",
-            right: "Watch out!"
+            capital_question: "shirley, watch out",
+            punctuation_question: "Shirley, watch out",
+            right: "Shirley, watch out!"
         },
         {
             punctuation_question: "Are you trying to cheat!",
@@ -126,7 +127,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
     ],
     [
         {
-            capital_question: "the man's name is Mr. Philips.",
+            capital_question: "the man's name is Mr. philips.",
             right: "The man's name is Mr. Philips."
         },
         {
@@ -162,7 +163,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: "The new transit plan will deliver substantial improvements to our customers."
         },
         {
-            capital_question: "Are there any Questions or concerns?",
+            capital_question: "Are there any Questions or Concerns?",
             right: "Are there any questions or concerns?"
         }
     ],
@@ -246,7 +247,7 @@ const questions: (TenOfType<PunctuationQuestion>|FiveOfType<PunctuationQuestion>
             right: '"We need to work fast," said Betty.'
         },
         {
-            capital_question: '"I\'m 100% sure!" Said Thomas.',
+            capital_question: '"I\'m 100% sure!" Said thomas.',
             right: '"I\'m 100% sure!" said Thomas.'
         },
         {
@@ -276,7 +277,7 @@ const myArray = [
     new SetBackground(require('./punctuation.png')),
     Label.label("category_selection"),
     new Invoke(() => {
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
             if(GameTools.directLink != "") {
                 for(let [key, val] of catNames) {
                     if(GameTools.directLink == GameTools.slugify(key)) {
