@@ -24,8 +24,10 @@ function getUnicode(str: string): number[] {
 }
 export class Question extends InfoBox {
     readonly isQuestion: boolean;
+    numIncorrectAnswers: number;
     constructor(protected type: QuestionType, question: GameValue<string>, protected choices: QuestionOption[], protected shouldReDisplay = true, style?: StylisticOptions, protected instructions: GameValue<string> = "") {
         super(question, "", Question.needsOKButton(type) ? "OK" : null, InfoBox.defaultDelay, style);
+        this.numIncorrectAnswers = 0;
         if(this.type == QuestionType.Custom)
             this.isQuestion = true;
         else
@@ -46,6 +48,10 @@ export class Question extends InfoBox {
         return { shouldShuffle: true };
     }
     buttonCallback(e: JQuery.ClickEvent) {
+        if($(e.currentTarget).text() == "Skip") {
+            this.displayNext();
+            return;
+        }
         if(this.type == QuestionType.FillInTheBlank) {
             $(e.target).prop("disabled", true);
             this.answered(this.$dialog.find(".modal-body").find("textarea"));
@@ -109,6 +115,10 @@ export class Question extends InfoBox {
             GameTools.lastResult = false;
             
             this.title = "Sorry, that wasn't the correct answer.";
+            this.numIncorrectAnswers++;
+            if(this.type == QuestionType.FillInTheBlank && this.numIncorrectAnswers >= 2) {
+                this.title = "Click the gray box to reveal the answer.";
+            }
             if(this.shouldReDisplay)
                 this.redisplay();
             else
@@ -170,6 +180,14 @@ export class Question extends InfoBox {
                 const input: HTMLTextAreaElement = e.target as any;
                 input.value = input.value.replace(/\n/g, '');
             });
+            if(this.numIncorrectAnswers >= 2) {
+                const $answerDiv = $("<div></div>").addClass("question-correct-answer-div").attr("tabindex", "0");
+                $answerDiv.text(DisplayedItem.getValue(null, this.choices[0].html));
+                $body.append($answerDiv);
+                const $skipButton = $("<button></button>").addClass("btn btn-secondary").attr("type", "button").text("Skip");
+                $skipButton.on("click", (e) => this.buttonCallback(e));
+                this.$footer.prepend($skipButton);
+            }
             $body.append($("<p></p>"));
             $body.append($input);
             if(this.objStyle.showMobileTips)

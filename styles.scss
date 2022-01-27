@@ -54,3 +54,16 @@ html {
         border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
 }
+
+.question-correct-answer-div {
+    text-align: left;
+    background-color: gray;
+    color: transparent;
+    cursor: help;
+    /*user-select: none;*/
+    transition: background-color 0.3s ease 0.2s, color 0.2s ease 0.25s;
+    &:hover, &:focus {
+        background-color: #e8e8e8;
+        color: inherit;
+    }
+}
